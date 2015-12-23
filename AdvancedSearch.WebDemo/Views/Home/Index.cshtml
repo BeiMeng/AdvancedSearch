@@ -1,0 +1,96 @@
+﻿@model AdvancedSearch.WebDemo.Model.Student
+@{
+    Layout = null;
+}
+@{
+    var x = @Html.Ui();
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Scripts/Easyui-1.4.2/themes/default/easyui.css" rel="stylesheet" />
+    <script src="~/Scripts/Easyui-1.4.2/jquery.min.js"></script>
+    <script src="~/Scripts/Easyui-1.4.2/jquery.easyui.min.js"></script>
+    <script src="~/Scripts/Easyui-1.4.2/Easyui.Extensions.js"></script>
+    <script type="text/javascript">
+        (function ($) {
+            //将表单序列化为json
+            $.fn.serializeJson = function () {
+                var result = {};
+                var array = this.serializeArray();
+                $(array).each(function () {
+                    if (result[this.name]) {
+                        if ($.isArray(result[this.name])) {
+                            result[this.name].push(this.value);
+                        } else {
+                            result[this.name] = [result[this.name], this.value];
+                        }
+                    } else {
+                        result[this.name] = this.value;
+                    }
+                });
+                return result;
+            };
+        })(jQuery);
+
+        $(function () {
+            $('#dg').datagrid({
+                url: 'Home/Query',
+                columns: [[
+                    { field: 'StuId', title: 'StuId', width: 100 },
+                    { field: 'StuName', title: 'StuName', width: 100 },
+                    { field: 'Nullint', title: 'Nullint', width: 100, align: 'right' },
+                    { field: 'CreateTime', title: 'CreateTime', width: 100, align: 'right' },
+                    { field: 'Birthday', title: 'Birthday', width: 100, align: 'right' },
+                    { field: 'LoveGril', title: 'LoveGril', width: 100, align: 'right' }
+                ]]
+            });
+            $('#a_search').click(function () {
+                search.go('dg');
+            });
+
+            $("#search").click(function () {
+                Query('formQuery', 'dg');
+            });
+        });
+        function Query(formId, gridId) {
+            $("#" + gridId).datagrid({
+                pageNumber: 1,
+                queryParams: $("#" + formId).serializeJson()
+            });
+        }
+    </script>
+
+</head>
+<body>
+    <div id="divQuery" class="divQueryForm">
+        <form id="formQuery" class="form" gridid="dg">
+            @*ID(like操作)：@x.TextBox("StuId").Contains().Value("")<br/>*@
+            @*ID(like操作)： <input type="text" name="[Contains]StuId" value=""/><br/>*@
+            @*Name： <input type="text" name="[Equal]StuName" value="" /><br />
+            Birthday: <input type="datetime" name="[Equal]Birthday" value="" /><br />
+            LoveGril (IN操作):<input type="text" name="[In]LoveGril" value="" /> 例如：MM,LILI<br />
+            CreateTime<input type="datetime" name="[GreaterEqual]CreateTime" value=""/>~<input type="datetime" value="" name="[LessEqual]CreateTime"/><br/>*@
+
+
+
+            ID(like操作)：@x.TextBox(t => t.StuId).Contains()<br/>
+            Name： @x.TextBox(t => t.StuName).Equal()<br/>
+            Nullint： @x.TextBox(t => t.Nullint).Greater()<br/>
+            Birthday: @x.TextBox(t => t.Birthday).Equal()<br/>
+            LoveGril (IN操作):@x.TextBox(t => t.LoveGril).In() 例如：MM,LILI<br/>
+            CreateTime:@x.TextBox(t => t.CreateTime).GreaterEqual()~@x.TextBox(t => t.CreateTime).LessEqual()
+        </form>
+        <input type="button" id="search" value="智能查询" />
+        <a id="a_search" style="float: left" href="javascript:;" plain="false" class="easyui-linkbutton" icon="icon-search" title="查询">高级查询</a>
+    </div>
+<div>
+
+</div>
+<table id="dg"></table>
+<script src="~/Scripts/AdvancedSearch/Search.js"></script>
+</body>
+</html>
